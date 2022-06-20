@@ -152,9 +152,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.garbagemule</groupId>
+            <groupId>com.github.garbagemule</groupId>
             <artifactId>MobArena</artifactId>
-            <version>0.99.1-SNAPSHOT</version>
+            <version>0.100.1</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
