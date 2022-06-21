@@ -19,7 +19,7 @@ public class VanillaExperienceListener implements Listener {
 
     public VanillaExperienceListener(MagicController controller, Configuration mainConfig) {
         this.controller = controller;
-        this.scaleFactor = mainConfig.getDouble("experience-factor.vanilla-exp");
+        this.scaleFactor = mainConfig.getDouble("experience-factors.vanilla-exp");
     }
 
     @EventHandler

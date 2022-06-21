@@ -1,5 +1,6 @@
 package com.elmakers.mine.bukkit.magic.listener;
 
+import com.elmakers.mine.bukkit.action.CastContext;
 import com.elmakers.mine.bukkit.api.event.EarnEvent;
 import com.elmakers.mine.bukkit.api.magic.CasterProperties;
 import com.elmakers.mine.bukkit.api.magic.Mage;
@@ -27,7 +28,7 @@ public class McMmoListener implements Listener {
         this.controller = controller;
         this.scaleFactors = new HashMap<>();
 
-        ConfigurationSection mcmmoSection = mainConfig.getConfigurationSection("experience-factor.mcmmo");
+        ConfigurationSection mcmmoSection = mainConfig.getConfigurationSection("experience-factors.mcmmo");
         if (mcmmoSection != null) {
             for (String skillKey : mcmmoSection.getKeys(false)) {
                 PrimarySkillType skill = Enums.getIfPresent(PrimarySkillType.class, skillKey.toUpperCase()).orNull();
