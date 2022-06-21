@@ -1614,8 +1614,11 @@ public class MagicController implements MageController, ChunkLoadListener {
         pm.registerEvents(inventoryController, plugin);
         pm.registerEvents(explosionController, plugin);
         pm.registerEvents(kitController, plugin);
-        if (mcMmoListener != null) pm.registerEvents(mcMmoListener, plugin);
-        pm.registerEvents(vanillaExperienceListener, plugin);
+
+        //Disabled
+        //if (mcMmoListener != null) pm.registerEvents(mcMmoListener, plugin);
+        //pm.registerEvents(vanillaExperienceListener, plugin);
+
         ArenaListener listener = new ArenaListener(arenaController);
         pm.registerEvents(listener, plugin);
         if (jumpController != null) {
