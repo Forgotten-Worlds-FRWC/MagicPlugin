@@ -1,90 +1,5 @@
 package com.elmakers.mine.bukkit.magic;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.CodeSource;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.bstats.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.block.Skull;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
-
 import com.elmakers.mine.bukkit.ChatUtils;
 import com.elmakers.mine.bukkit.action.ActionHandler;
 import com.elmakers.mine.bukkit.api.attributes.AttributeProvider;
@@ -106,40 +21,17 @@ import com.elmakers.mine.bukkit.api.event.SaveEvent;
 import com.elmakers.mine.bukkit.api.integration.ClientPlatform;
 import com.elmakers.mine.bukkit.api.item.ItemData;
 import com.elmakers.mine.bukkit.api.item.ItemUpdatedCallback;
-import com.elmakers.mine.bukkit.api.magic.CastSourceLocation;
-import com.elmakers.mine.bukkit.api.magic.DeathLocation;
 import com.elmakers.mine.bukkit.api.magic.Mage;
 import com.elmakers.mine.bukkit.api.magic.MageContext;
-import com.elmakers.mine.bukkit.api.magic.MageController;
-import com.elmakers.mine.bukkit.api.magic.MagicAPI;
-import com.elmakers.mine.bukkit.api.magic.MagicAttribute;
-import com.elmakers.mine.bukkit.api.magic.MagicProvider;
-import com.elmakers.mine.bukkit.api.magic.MaterialSet;
-import com.elmakers.mine.bukkit.api.magic.MaterialSetManager;
-import com.elmakers.mine.bukkit.api.protection.BlockBreakManager;
-import com.elmakers.mine.bukkit.api.protection.BlockBuildManager;
-import com.elmakers.mine.bukkit.api.protection.CastPermissionManager;
-import com.elmakers.mine.bukkit.api.protection.EntityTargetingManager;
-import com.elmakers.mine.bukkit.api.protection.PVPManager;
-import com.elmakers.mine.bukkit.api.protection.PlayerWarp;
-import com.elmakers.mine.bukkit.api.protection.PlayerWarpManager;
-import com.elmakers.mine.bukkit.api.protection.PlayerWarpProvider;
+import com.elmakers.mine.bukkit.api.magic.*;
+import com.elmakers.mine.bukkit.api.protection.*;
 import com.elmakers.mine.bukkit.api.requirements.Requirement;
 import com.elmakers.mine.bukkit.api.requirements.RequirementsProcessor;
 import com.elmakers.mine.bukkit.api.requirements.RequirementsProvider;
 import com.elmakers.mine.bukkit.api.rp.ResourcePackStatus;
-import com.elmakers.mine.bukkit.api.spell.CastingCost;
-import com.elmakers.mine.bukkit.api.spell.MageSpell;
-import com.elmakers.mine.bukkit.api.spell.Spell;
-import com.elmakers.mine.bukkit.api.spell.SpellKey;
-import com.elmakers.mine.bukkit.api.spell.SpellResult;
-import com.elmakers.mine.bukkit.api.spell.SpellTemplate;
+import com.elmakers.mine.bukkit.api.spell.*;
 import com.elmakers.mine.bukkit.arena.ArenaController;
-import com.elmakers.mine.bukkit.block.BlockData;
-import com.elmakers.mine.bukkit.block.DefaultMaterials;
-import com.elmakers.mine.bukkit.block.LegacySchematic;
-import com.elmakers.mine.bukkit.block.MaterialAndData;
-import com.elmakers.mine.bukkit.block.MaterialBrush;
+import com.elmakers.mine.bukkit.block.*;
 import com.elmakers.mine.bukkit.block.magic.MagicBlock;
 import com.elmakers.mine.bukkit.block.magic.MagicBlockTemplate;
 import com.elmakers.mine.bukkit.citizens.CitizensController;
@@ -148,16 +40,7 @@ import com.elmakers.mine.bukkit.configuration.MagicConfiguration;
 import com.elmakers.mine.bukkit.crafting.MagicRecipe;
 import com.elmakers.mine.bukkit.data.YamlDataFile;
 import com.elmakers.mine.bukkit.dynmap.DynmapController;
-import com.elmakers.mine.bukkit.economy.BaseMagicCurrency;
-import com.elmakers.mine.bukkit.economy.CustomCurrency;
-import com.elmakers.mine.bukkit.economy.ExperienceCurrency;
-import com.elmakers.mine.bukkit.economy.HealthCurrency;
-import com.elmakers.mine.bukkit.economy.HungerCurrency;
-import com.elmakers.mine.bukkit.economy.ItemCurrency;
-import com.elmakers.mine.bukkit.economy.LevelCurrency;
-import com.elmakers.mine.bukkit.economy.ManaCurrency;
-import com.elmakers.mine.bukkit.economy.SpellPointCurrency;
-import com.elmakers.mine.bukkit.economy.VaultCurrency;
+import com.elmakers.mine.bukkit.economy.*;
 import com.elmakers.mine.bukkit.elementals.ElementalsController;
 import com.elmakers.mine.bukkit.entity.PermissionsTeamProvider;
 import com.elmakers.mine.bukkit.entity.ScoreboardTeamProvider;
@@ -165,27 +48,7 @@ import com.elmakers.mine.bukkit.essentials.EssentialsController;
 import com.elmakers.mine.bukkit.essentials.MagicItemDb;
 import com.elmakers.mine.bukkit.essentials.Mailer;
 import com.elmakers.mine.bukkit.heroes.HeroesManager;
-import com.elmakers.mine.bukkit.integration.AuctionHouseManager;
-import com.elmakers.mine.bukkit.integration.AureliumSkillsManager;
-import com.elmakers.mine.bukkit.integration.BattleArenaManager;
-import com.elmakers.mine.bukkit.integration.GenericMetadataNPCSupplier;
-import com.elmakers.mine.bukkit.integration.GeyserManager;
-import com.elmakers.mine.bukkit.integration.LegacyLibsDisguiseManager;
-import com.elmakers.mine.bukkit.integration.LegacyMythicMobManager;
-import com.elmakers.mine.bukkit.integration.LibsDisguiseManager;
-import com.elmakers.mine.bukkit.integration.LightAPIManager;
-import com.elmakers.mine.bukkit.integration.LogBlockManager;
-import com.elmakers.mine.bukkit.integration.ModelEngineManager;
-import com.elmakers.mine.bukkit.integration.ModernLibsDisguiseManager;
-import com.elmakers.mine.bukkit.integration.ModernMythicMobManager;
-import com.elmakers.mine.bukkit.integration.MythicMobManager;
-import com.elmakers.mine.bukkit.integration.NPCSupplierSet;
-import com.elmakers.mine.bukkit.integration.PlaceholderAPIManager;
-import com.elmakers.mine.bukkit.integration.SkillAPIManager;
-import com.elmakers.mine.bukkit.integration.SkriptManager;
-import com.elmakers.mine.bukkit.integration.TokenManagerController;
-import com.elmakers.mine.bukkit.integration.TradeSystemManager;
-import com.elmakers.mine.bukkit.integration.VaultController;
+import com.elmakers.mine.bukkit.integration.*;
 import com.elmakers.mine.bukkit.integration.mobarena.MobArenaManager;
 import com.elmakers.mine.bukkit.item.Icon;
 import com.elmakers.mine.bukkit.kit.KitController;
@@ -195,44 +58,12 @@ import com.elmakers.mine.bukkit.magic.command.MagicTraitCommandExecutor;
 import com.elmakers.mine.bukkit.magic.command.WandCommandExecutor;
 import com.elmakers.mine.bukkit.magic.command.config.FetchExampleRunnable;
 import com.elmakers.mine.bukkit.magic.command.config.UpdateAllExamplesCallback;
-import com.elmakers.mine.bukkit.magic.listener.AnvilController;
-import com.elmakers.mine.bukkit.magic.listener.ArenaListener;
-import com.elmakers.mine.bukkit.magic.listener.BlockController;
-import com.elmakers.mine.bukkit.magic.listener.ChunkLoadListener;
-import com.elmakers.mine.bukkit.magic.listener.CraftingController;
-import com.elmakers.mine.bukkit.magic.listener.EnchantingController;
-import com.elmakers.mine.bukkit.magic.listener.EntityController;
-import com.elmakers.mine.bukkit.magic.listener.ErrorNotifier;
-import com.elmakers.mine.bukkit.magic.listener.ExplosionController;
-import com.elmakers.mine.bukkit.magic.listener.HangingController;
-import com.elmakers.mine.bukkit.magic.listener.InventoryController;
-import com.elmakers.mine.bukkit.magic.listener.ItemController;
-import com.elmakers.mine.bukkit.magic.listener.JumpController;
-import com.elmakers.mine.bukkit.magic.listener.MinigamesListener;
-import com.elmakers.mine.bukkit.magic.listener.MobController;
-import com.elmakers.mine.bukkit.magic.listener.PlayerController;
-import com.elmakers.mine.bukkit.magic.listener.WildStackerListener;
+import com.elmakers.mine.bukkit.magic.listener.*;
 import com.elmakers.mine.bukkit.maps.MapController;
 import com.elmakers.mine.bukkit.materials.MaterialSets;
 import com.elmakers.mine.bukkit.materials.SimpleMaterialSetManager;
 import com.elmakers.mine.bukkit.npc.MagicNPC;
-import com.elmakers.mine.bukkit.protection.AJParkourManager;
-import com.elmakers.mine.bukkit.protection.CitadelManager;
-import com.elmakers.mine.bukkit.protection.DeadSoulsManager;
-import com.elmakers.mine.bukkit.protection.FactionsManager;
-import com.elmakers.mine.bukkit.protection.GriefPreventionManager;
-import com.elmakers.mine.bukkit.protection.LocketteManager;
-import com.elmakers.mine.bukkit.protection.MultiverseManager;
-import com.elmakers.mine.bukkit.protection.NCPManager;
-import com.elmakers.mine.bukkit.protection.PreciousStonesManager;
-import com.elmakers.mine.bukkit.protection.ProtectionManager;
-import com.elmakers.mine.bukkit.protection.PvPManagerManager;
-import com.elmakers.mine.bukkit.protection.RedProtectManager;
-import com.elmakers.mine.bukkit.protection.ResidenceManager;
-import com.elmakers.mine.bukkit.protection.TownyManager;
-import com.elmakers.mine.bukkit.protection.UltimateClansLandsManager;
-import com.elmakers.mine.bukkit.protection.UltimateClansManager;
-import com.elmakers.mine.bukkit.protection.WorldGuardManager;
+import com.elmakers.mine.bukkit.protection.*;
 import com.elmakers.mine.bukkit.requirements.RequirementsController;
 import com.elmakers.mine.bukkit.resourcepack.ResourcePackManager;
 import com.elmakers.mine.bukkit.spell.BaseSpell;
@@ -270,18 +101,11 @@ import com.elmakers.mine.bukkit.utility.CurrencyAmount;
 import com.elmakers.mine.bukkit.utility.HitboxUtils;
 import com.elmakers.mine.bukkit.utility.LogMessage;
 import com.elmakers.mine.bukkit.utility.MagicLogger;
+import com.elmakers.mine.bukkit.tasks.*;
 import com.elmakers.mine.bukkit.utility.Messages;
-import com.elmakers.mine.bukkit.utility.SafetyUtils;
-import com.elmakers.mine.bukkit.utility.SkullLoadedCallback;
+import com.elmakers.mine.bukkit.utility.*;
 import com.elmakers.mine.bukkit.utility.platform.DeprecatedUtils;
-import com.elmakers.mine.bukkit.wand.LostWand;
-import com.elmakers.mine.bukkit.wand.Wand;
-import com.elmakers.mine.bukkit.wand.WandManaMode;
-import com.elmakers.mine.bukkit.wand.WandMode;
-import com.elmakers.mine.bukkit.wand.WandSet;
-import com.elmakers.mine.bukkit.wand.WandTemplate;
-import com.elmakers.mine.bukkit.wand.WandUpgradePath;
-import com.elmakers.mine.bukkit.wand.WandUpgradeSlotTemplate;
+import com.elmakers.mine.bukkit.wand.*;
 import com.elmakers.mine.bukkit.warp.MagicWarp;
 import com.elmakers.mine.bukkit.warp.MagicWarpDescription;
 import com.elmakers.mine.bukkit.warp.WarpController;
@@ -290,8 +114,58 @@ import com.elmakers.mine.bukkit.world.WorldController;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-
 import de.slikey.effectlib.math.EquationStore;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
+import org.bstats.Metrics;
+import org.bukkit.*;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.*;
+import org.bukkit.command.BlockCommandSender;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.*;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.*;
+import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.CodeSource;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 public class MagicController implements MageController, ChunkLoadListener {
     private static final String BUILTIN_SPELL_CLASSPATH = "com.elmakers.mine.bukkit.spell.builtin";
@@ -310,7 +184,7 @@ public class MagicController implements MageController, ChunkLoadListener {
     protected static Random random = new Random();
     private final Set<String> builtinMageAttributes = ImmutableSet.of(
             "health", "health_max",
-            "armor",  "luck",
+            "armor", "luck",
             "knockback_resistance", "movement_speed", "movement_speed_bps",
             "attack_damage",
             "location_x", "location_y", "location_z", "yaw", "pitch",
@@ -570,7 +444,8 @@ public class MagicController implements MageController, ChunkLoadListener {
     private JumpController jumpController = null;
     private WorldController worldController = null;
     private ArenaController arenaController = null;
-    private @Nonnull MageIdentifier mageIdentifier = new MageIdentifier();
+    private @Nonnull
+    MageIdentifier mageIdentifier = new MageIdentifier();
     private boolean citizensEnabled = true;
     private boolean logBlockEnabled = true;
     private boolean libsDisguiseEnabled = true;
@@ -621,6 +496,9 @@ public class MagicController implements MageController, ChunkLoadListener {
     private @Nonnull
     MaterialSet offhandMaterials = MaterialSets.empty();
     private GeyserManager geyserManager = null;
+
+    private McMmoListener mcMmoListener;
+    private VanillaExperienceListener vanillaExperienceListener;
 
     public MagicController(final Plugin plugin) {
         this.plugin = plugin;
@@ -702,7 +580,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         Mage mage = getRegisteredMage(player);
         if (mage != null) {
             if (velocity != null && mage instanceof com.elmakers.mine.bukkit.magic.Mage) {
-                ((com.elmakers.mine.bukkit.magic.Mage)mage).setVelocity(velocity);
+                ((com.elmakers.mine.bukkit.magic.Mage) mage).setVelocity(velocity);
             }
             mage.trigger("jump");
         }
@@ -1541,6 +1419,12 @@ public class MagicController implements MageController, ChunkLoadListener {
         if (CompatibilityLib.hasStatistics() && !CompatibilityLib.hasJumpEvent()) {
             jumpController = new JumpController(this);
         }
+
+        if (plugin.getServer().getPluginManager().isPluginEnabled("McMMO")) {
+            mcMmoListener = new McMmoListener(this, plugin.getConfig());
+        }
+        vanillaExperienceListener = new VanillaExperienceListener(this, plugin.getConfig());
+
         File examplesFolder = new File(getPlugin().getDataFolder(), "examples");
         examplesFolder.mkdirs();
 
@@ -1583,7 +1467,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         File newConfig = new File(configFolder, toName + ".yml");
 
         if (!newConfig.exists() && legacyConfig.exists()) {
-            String message = "Migrating "  + fromName + ".yml to " + toName + ".yml";
+            String message = "Migrating " + fromName + ".yml to " + toName + ".yml";
             if (!dataFile) {
                 message += ", please update " + toName + ".yml from now on";
             }
@@ -1598,7 +1482,7 @@ public class MagicController implements MageController, ChunkLoadListener {
             File newFolder = new File(configFolder, toName);
 
             if (!newFolder.exists() && legacyFolder.exists()) {
-                getLogger().info("Migrating folder "  + fromName + " to " + toName);
+                getLogger().info("Migrating folder " + fromName + " to " + toName);
                 legacyFolder.renameTo(newFolder);
             } else if (newFolder.exists() && legacyFolder.exists()) {
                 getLogger().warning("Both folders exist, will not migrate: " + fromName + " and " + toName);
@@ -1730,6 +1614,8 @@ public class MagicController implements MageController, ChunkLoadListener {
         pm.registerEvents(inventoryController, plugin);
         pm.registerEvents(explosionController, plugin);
         pm.registerEvents(kitController, plugin);
+        if (mcMmoListener != null) pm.registerEvents(mcMmoListener, plugin);
+        pm.registerEvents(vanillaExperienceListener, plugin);
         ArenaListener listener = new ArenaListener(arenaController);
         pm.registerEvents(listener, plugin);
         if (jumpController != null) {
@@ -2014,7 +1900,7 @@ public class MagicController implements MageController, ChunkLoadListener {
             logger.setContext("reload active mages");
             for (Mage mage : mages.values()) {
                 if (mage instanceof com.elmakers.mine.bukkit.magic.Mage) {
-                    com.elmakers.mine.bukkit.magic.Mage impl = ((com.elmakers.mine.bukkit.magic.Mage)mage);
+                    com.elmakers.mine.bukkit.magic.Mage impl = ((com.elmakers.mine.bukkit.magic.Mage) mage);
                     impl.reloadClasses();
                     impl.reloadModifiers();
                 }
@@ -3884,7 +3770,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         }
 
         // Fall back to regions
-        Player player = entity instanceof Player ? (Player)entity : null;
+        Player player = entity instanceof Player ? (Player) entity : null;
         return worldGuardManager.getPortalSpell(player, location);
     }
 
@@ -3897,7 +3783,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         }
 
         // Fall back to regions
-        Player player = entity instanceof Player ? (Player)entity : null;
+        Player player = entity instanceof Player ? (Player) entity : null;
         String regionWarp = worldGuardManager.getPortalWarp(player, location);
         return regionWarp == null ? null : new MagicWarpDescription(this, regionWarp);
     }
@@ -3950,7 +3836,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         }
         // I did not realize that Entity extends CommandSender .. ??
         if (entity instanceof Player) {
-            return hasPermission((CommandSender)entity, pNode);
+            return hasPermission((CommandSender) entity, pNode);
         }
         return false;
     }
@@ -4474,12 +4360,12 @@ public class MagicController implements MageController, ChunkLoadListener {
     }
 
     public JavaPlugin getJavaPlugin() {
-        return (JavaPlugin)plugin;
+        return (JavaPlugin) plugin;
     }
 
     @Override
     public MagicAPI getAPI() {
-        return (MagicAPI)plugin;
+        return (MagicAPI) plugin;
     }
 
     public Collection<? extends Mage> getMutableMages() {
@@ -4785,7 +4671,7 @@ public class MagicController implements MageController, ChunkLoadListener {
 
     @Nullable
     public Wand createWand(String wandKey, Mage mage) {
-        return Wand.createWand(this, wandKey, mage instanceof com.elmakers.mine.bukkit.magic.Mage ? (com.elmakers.mine.bukkit.magic.Mage)mage : null);
+        return Wand.createWand(this, wandKey, mage instanceof com.elmakers.mine.bukkit.magic.Mage ? (com.elmakers.mine.bukkit.magic.Mage) mage : null);
     }
 
     @Override
@@ -5300,7 +5186,7 @@ public class MagicController implements MageController, ChunkLoadListener {
     }
 
     public ItemStack getSpellBook() {
-        return getSpellBook((SpellCategory)null);
+        return getSpellBook((SpellCategory) null);
     }
 
     public ItemStack getSpellBook(com.elmakers.mine.bukkit.api.spell.SpellCategory category) {
@@ -5555,7 +5441,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         if (DefaultMaterials.isMobSpawner(blockType)) {
             BlockState blockState = block.getState();
             if (blockState instanceof CreatureSpawner) {
-                CreatureSpawner spawner = (CreatureSpawner)blockState;
+                CreatureSpawner spawner = (CreatureSpawner) blockState;
                 description += ":" + spawner.getSpawnedType().name().toLowerCase();
             }
         }
@@ -6057,7 +5943,7 @@ public class MagicController implements MageController, ChunkLoadListener {
     @Override
     public ItemStack createSpellItem(String spellKey, Mage mage, boolean brief) {
         com.elmakers.mine.bukkit.api.wand.Wand apiWand = mage == null ? null : mage.getActiveWand();
-        Wand wand = apiWand instanceof Wand ? (Wand)apiWand : null;
+        Wand wand = apiWand instanceof Wand ? (Wand) apiWand : null;
         return Wand.createSpellItem(spellKey, this, mage, wand, true, brief);
     }
 
@@ -6090,7 +5976,8 @@ public class MagicController implements MageController, ChunkLoadListener {
         if (secondIsEmpty || firstIsEmpty) return false;
         if (first.getType() != second.getType()) return false;
         DeprecatedUtils deprecatedUtils = CompatibilityLib.getDeprecatedUtils();
-        if (!ignoreDamage && deprecatedUtils.getItemDamage(first) != deprecatedUtils.getItemDamage(second)) return false;
+        if (!ignoreDamage && deprecatedUtils.getItemDamage(first) != deprecatedUtils.getItemDamage(second))
+            return false;
 
         boolean firstIsWand = Wand.isWandOrUpgrade(first);
         boolean secondIsWand = Wand.isWandOrUpgrade(second);

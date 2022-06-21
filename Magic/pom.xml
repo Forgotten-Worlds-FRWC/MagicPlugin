@@ -475,6 +475,12 @@
             <version>4.0.4.9</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.gmail.nossr50.mcMMO</groupId>
+            <artifactId>mcMMO</artifactId>
+            <version>2.1.214</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -540,6 +546,11 @@
             <id>nexus</id>
             <name>Lumine Releases</name>
             <url>https://mvn.lumine.io/repository/maven-public/</url>
+        </repository>
+        <repository> <!-- for development builds -->
+            <id>neetgames</id>
+            <name>McMMO Repo</name>
+            <url>https://nexus.neetgames.com/repository/maven-releases/</url>
         </repository>
         <!--
             All of the following repositories seem to be offline.

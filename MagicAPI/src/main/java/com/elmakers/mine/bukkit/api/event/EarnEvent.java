@@ -12,7 +12,9 @@ import com.elmakers.mine.bukkit.api.magic.Mage;
  */
 public class EarnEvent extends Event implements Cancellable {
     public enum EarnCause {
-        SPELL_CAST
+        SPELL_CAST,
+        VANILLA_EXP,
+        MCMMO_EXP,
     }
 
     private static final HandlerList handlers = new HandlerList();

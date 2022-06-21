@@ -44,6 +44,7 @@ softdepend:
   - TokenManager
   - TradeSystem
   - zAuctionHouseV3
+  - McMMO
 loadbefore:
   - Scavenger
   - Quests

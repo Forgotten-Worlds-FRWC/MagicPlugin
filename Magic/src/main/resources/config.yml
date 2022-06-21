@@ -71,3 +71,22 @@
 
 # Turn on skull-based spell icons (may be needed if you're not using the RP)
 # url_icons_enabled: true
+
+experience-factors:
+  mcmmo:
+    ACROBATICS: 1.0
+    ALCHEMY: 1.0
+    ARCHERY: 1.0
+    AXES: 1.0
+    EXCAVATION: 1.0
+    FISHING: 1.0
+    HERBALISM: 1.0
+    MINING: 1.0
+    REPAIR: 1.0
+    SALVAGE: 1.0
+    SMELTING: 1.0
+    SWORDS: 1.0
+    TAMING: 1.0
+    UNARMED: 1.0
+    WOODCUTTING: 1.0
+  vanilla-exp: 1.0
