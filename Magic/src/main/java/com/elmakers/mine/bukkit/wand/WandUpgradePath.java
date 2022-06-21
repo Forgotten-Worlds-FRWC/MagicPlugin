@@ -102,8 +102,10 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
 
     private float bonusLevelMultiplier = 0.5f;
 
-    public WandUpgradePath(MageController controller, String key, WandUpgradePath inherit, ConfigurationSection template)
-    {
+    private boolean upgradeRequiresAllSpells = true;
+    private int upgradeRequiresLevel = -1;
+
+    public WandUpgradePath(MageController controller, String key, WandUpgradePath inherit, ConfigurationSection template) {
         this.parent = inherit;
         this.key = key;
         if (inherit != null) {
@@ -129,6 +131,9 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
             allSpells.addAll(inherit.allSpells);
             allExtraSpells.addAll(inherit.allExtraSpells);
             allBrushes.addAll(inherit.allBrushes);
+
+            upgradeRequiresAllSpells = inherit.upgradeRequiresAllSpells;
+            upgradeRequiresLevel = inherit.upgradeRequiresLevel;
 
             if (inherit.tags != null && !inherit.tags.isEmpty()) {
                 this.tags = new HashSet<>(inherit.tags);
@@ -185,6 +190,9 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         // Upgrade information
         upgradeKey = template.getString("upgrade");
         upgradeItemKey = template.getString("upgrade_item");
+
+        upgradeRequiresAllSpells = template.getBoolean("upgrade_requires_previous_spells", upgradeRequiresAllSpells);
+        upgradeRequiresLevel = template.getInt("upgrade_requires_level", upgradeRequiresLevel);
 
         Collection<PrerequisiteSpell> prerequisiteSpells = ConfigurationUtils.getPrerequisiteSpells(controller, template, "required_spells", "path " + key, false);
         this.requiredSpells = new ArrayList<>(pathSpells.size() + prerequisiteSpells.size());
@@ -689,16 +697,21 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
     @Override
     public boolean canProgress(CasterProperties properties) {
         if (levelMap == null) return false;
+        boolean progress = properties.getLevel() > upgradeRequiresLevel;
 
-        WandLevel maxLevel = levelMap.get(levels[levels.length - 1]);
-        Deque<WeightedPair<String>> remainingSpells = maxLevel.getRemainingSpells(properties);
+        if (upgradeRequiresAllSpells) {
+            WandLevel maxLevel = levelMap.get(levels[levels.length - 1]);
+            Deque<WeightedPair<String>> remainingSpells = maxLevel.getRemainingSpells(properties);
 
-        Mage mage = properties.getMage();
-        if (mage != null && mage.getDebugLevel() > 0) {
-            mage.sendDebugMessage("Spells remaining: " + remainingSpells.size());
+            Mage mage = properties.getMage();
+            if (mage != null && mage.getDebugLevel() > 0) {
+                mage.sendDebugMessage("Spells remaining: " + remainingSpells.size());
+            }
+
+            progress &= (remainingSpells.size() > 0);
         }
 
-        return (remainingSpells.size() > 0);
+        return progress;
     }
 
     @Override
