@@ -45,6 +45,8 @@ import com.elmakers.mine.bukkit.utility.CompatibilityLib;
 import com.elmakers.mine.bukkit.utility.ConfigurationUtils;
 import com.elmakers.mine.bukkit.utility.TextUtils;
 import com.elmakers.mine.bukkit.utility.random.WeightedPair;
+import com.forgottenrunes.levels.api.LevelAPI;
+import com.forgottenrunes.levels.data.MageLevel;
 
 /**
  * A represents a randomized upgrade path that a wand may use
@@ -697,7 +699,7 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
     @Override
     public boolean canProgress(CasterProperties properties) {
         if (levelMap == null) return false;
-        boolean progress = properties.getLevel() > upgradeRequiresLevel;
+        boolean progress = true;
 
         if (upgradeRequiresAllSpells) {
             WandLevel maxLevel = levelMap.get(levels[levels.length - 1]);
@@ -709,6 +711,13 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
             }
 
             progress &= (remainingSpells.size() > 0);
+        }
+
+        if (upgradeRequiresLevel >= 0) {
+            Mage m = properties.getMage();
+            Player p = m != null ? m.getPlayer() : null;
+            MageLevel ml = p != null ? LevelAPI.get().getLevel(p) : null;
+            progress &= ml != null && ml.getLevel() >= upgradeRequiresLevel;
         }
 
         return progress;

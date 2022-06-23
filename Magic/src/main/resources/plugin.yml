@@ -45,6 +45,7 @@ softdepend:
   - TradeSystem
   - zAuctionHouseV3
   - McMMO
+  - MagicLevels
 loadbefore:
   - Scavenger
   - Quests
