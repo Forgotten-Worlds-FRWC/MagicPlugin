@@ -95,4 +95,5 @@ public interface CasterProperties extends MagicConfigurable {
     @Nullable
     String getEffectParticleName();
     void sendMessageKey(String messageKey, String... parameters);
+    void checkUpgrade();
 }

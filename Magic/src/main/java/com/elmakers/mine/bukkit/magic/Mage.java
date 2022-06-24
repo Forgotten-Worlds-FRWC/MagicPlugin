@@ -6306,4 +6306,12 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             }
         }
     }
+
+    public void upgradeCheck() {
+        CasterProperties properties = getActiveProperties();
+        ProgressionPath p = properties.getPath();
+        if(p instanceof WandUpgradePath) {
+            ((WandUpgradePath) p).upgradeCheck();
+        }
+    }
 }

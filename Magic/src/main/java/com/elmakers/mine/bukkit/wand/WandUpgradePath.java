@@ -780,42 +780,53 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         Mage mage = caster.getMage();
 
         // Then check for spell requirements to advance
-        for (PrerequisiteSpell prereq : requiredSpells) {
-            if (!caster.hasSpell(prereq.getSpellKey().getKey())) {
-                SpellTemplate spell = controller.getSpellTemplate(prereq.getSpellKey().getKey());
-                if (spell == null) {
-                    controller.getLogger().warning("Invalid spell required for upgrade: " + prereq.getSpellKey().getKey());
-                    return false;
-                }
-                if (mage != null && !quiet)
-                {
-                    String requiredSpellMessage = getMessage(controller.getMessages(), "required_spell");
-                    String message = requiredSpellMessage.replace("$spell", spell.getName());
-                    com.elmakers.mine.bukkit.api.wand.WandUpgradePath upgradePath = getUpgrade();
-                    if (upgradePath != null) {
-                        message = message.replace("$path", upgradePath.getName());
+        if(upgradeRequiresAllSpells) {
+            for (PrerequisiteSpell prereq : requiredSpells) {
+                if (!caster.hasSpell(prereq.getSpellKey().getKey())) {
+                    SpellTemplate spell = controller.getSpellTemplate(prereq.getSpellKey().getKey());
+                    if (spell == null) {
+                        controller.getLogger().warning("Invalid spell required for upgrade: " + prereq.getSpellKey().getKey());
+                        return false;
                     }
-                    mage.sendMessage(message);
-                }
-                return false;
-            } else {
-                Spell spell = caster.getSpell(prereq.getSpellKey().getKey());
-                if (!PrerequisiteSpell.isSpellSatisfyingPrerequisite(spell, prereq)) {
                     if (mage != null && !quiet) {
-                        String message = getMessage(controller.getMessages(), "spell.prerequisite_spell_level")
-                                .replace("$name", spell.getName())
-                                .replace("$level", Integer.toString(prereq.getSpellKey().getLevel()));
-                        if (prereq.getProgressLevel() > 1) {
-                            message += getMessage(controller.getMessages(), "spell.prerequisite_spell_progress_level")
-                                    .replace("$level", Long.toString(prereq.getProgressLevel()))
-                                    // This max level should never return 0 here but just in case we'll make the min 1.
-                                    .replace("$max_level", Long.toString(Math.max(1, spell.getMaxProgressLevel())));
+                        String requiredSpellMessage = getMessage(controller.getMessages(), "required_spell");
+                        String message = requiredSpellMessage.replace("$spell", spell.getName());
+                        com.elmakers.mine.bukkit.api.wand.WandUpgradePath upgradePath = getUpgrade();
+                        if (upgradePath != null) {
+                            message = message.replace("$path", upgradePath.getName());
                         }
                         mage.sendMessage(message);
                     }
                     return false;
+                } else {
+                    Spell spell = caster.getSpell(prereq.getSpellKey().getKey());
+                    if (!PrerequisiteSpell.isSpellSatisfyingPrerequisite(spell, prereq)) {
+                        if (mage != null && !quiet) {
+                            String message = getMessage(controller.getMessages(), "spell.prerequisite_spell_level")
+                                    .replace("$name", spell.getName())
+                                    .replace("$level", Integer.toString(prereq.getSpellKey().getLevel()));
+                            if (prereq.getProgressLevel() > 1) {
+                                message += getMessage(controller.getMessages(), "spell.prerequisite_spell_progress_level")
+                                        .replace("$level", Long.toString(prereq.getProgressLevel()))
+                                        // This max level should never return 0 here but just in case we'll make the min 1.
+                                        .replace("$max_level", Long.toString(Math.max(1, spell.getMaxProgressLevel())));
+                            }
+                            mage.sendMessage(message);
+                        }
+                        return false;
+                    }
                 }
             }
+        }
+
+        if (upgradeRequiresLevel >= 0) {
+            Mage m = caster.getMage();
+            System.out.println("m = " + m);
+            Player p = m != null ? m.getPlayer() : null;
+            System.out.println("p = " + p);
+            MageLevel ml = p != null ? LevelAPI.get().getLevel(p) : null;
+            System.out.println("ml = " + ml);
+            return ml != null && ml.getLevel() >= upgradeRequiresLevel;
         }
 
         return true;

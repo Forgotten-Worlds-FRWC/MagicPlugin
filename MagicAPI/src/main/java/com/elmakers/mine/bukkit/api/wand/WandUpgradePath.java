@@ -23,4 +23,5 @@ public interface WandUpgradePath extends ProgressionPath {
     void upgrade(@Nonnull Wand wand, Mage mage);
     void checkMigration(Wand wand);
     boolean canEnchant(Wand wand);
+    void upgradeCheck();
 }

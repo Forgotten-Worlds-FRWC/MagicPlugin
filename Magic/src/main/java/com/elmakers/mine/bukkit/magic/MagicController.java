@@ -499,6 +499,7 @@ public class MagicController implements MageController, ChunkLoadListener {
 
     private McMmoListener mcMmoListener;
     private VanillaExperienceListener vanillaExperienceListener;
+    private LevelListener levelListener;
 
     public MagicController(final Plugin plugin) {
         this.plugin = plugin;
@@ -1424,6 +1425,7 @@ public class MagicController implements MageController, ChunkLoadListener {
             mcMmoListener = new McMmoListener(this, plugin.getConfig());
         }
         vanillaExperienceListener = new VanillaExperienceListener(this, plugin.getConfig());
+        levelListener = new LevelListener(this);
 
         File examplesFolder = new File(getPlugin().getDataFolder(), "examples");
         examplesFolder.mkdirs();
@@ -1618,6 +1620,7 @@ public class MagicController implements MageController, ChunkLoadListener {
         //Disabled
         //if (mcMmoListener != null) pm.registerEvents(mcMmoListener, plugin);
         //pm.registerEvents(vanillaExperienceListener, plugin);
+        pm.registerEvents(levelListener, plugin);
 
         ArenaListener listener = new ArenaListener(arenaController);
         pm.registerEvents(listener, plugin);

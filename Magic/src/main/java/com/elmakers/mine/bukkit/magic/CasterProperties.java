@@ -1517,4 +1517,17 @@ public abstract class CasterProperties extends BaseMagicConfigurable implements 
         ConfigurationSection attributesSection = getConfigurationSection("attributes");
         return addAttributes(null, attributesSection);
     }
+
+    public void checkUpgrade() {
+        Mage mage = getMage();
+        Wand wand = (this instanceof Wand) ? (Wand) this : (mage == null ? null : mage.getActiveWand());
+        if(getPath() instanceof WandUpgradePath path) {
+            WandUpgradePath nextPath = path.getUpgrade();
+            if (nextPath != null) {
+                if (path.checkUpgradeRequirements(this, false) && (wand != null || mage != null)) {
+                    path.upgrade(wand, mage);
+                }
+            }
+        }
+    }
 }
