@@ -3,6 +3,7 @@ package com.elmakers.mine.bukkit.economy;
 import com.elmakers.mine.bukkit.api.magic.CasterProperties;
 import com.elmakers.mine.bukkit.api.magic.Mage;
 import com.elmakers.mine.bukkit.api.magic.MageController;
+import com.elmakers.mine.bukkit.api.wand.Wand;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -59,6 +60,9 @@ public class ManaCurrency extends BaseMagicCurrency {
         } else {
             caster.removeMana((float) amount);
         }
+
+        Wand wand = mage.getActiveWand();
+        if(wand == null) mage.updateActionBar();
     }
 
     @Override
@@ -71,6 +75,16 @@ public class ManaCurrency extends BaseMagicCurrency {
         }
         float newMana = (float) Math.min(caster.getManaMax(), caster.getMana() + amount);
         caster.setMana(newMana);
+
+        Wand wand = mage.getActiveWand();
+        if(wand == null) {
+            if(mage.getMana() < caster.getManaMax()) {
+                mage.updateActionBar();
+            } else {
+                mage.resetSentExperience();
+            }
+        }
+
         return true;
     }
 

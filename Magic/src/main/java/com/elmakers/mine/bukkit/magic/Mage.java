@@ -1,71 +1,5 @@
 package com.elmakers.mine.bukkit.magic;
 
-import static com.google.common.base.Verify.verifyNotNull;
-
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.logging.Level;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.WorldBorder;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MainHand;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
-
 import com.elmakers.mine.bukkit.api.action.GUIAction;
 import com.elmakers.mine.bukkit.api.attributes.AttributeProvider;
 import com.elmakers.mine.bukkit.api.batch.Batch;
@@ -81,21 +15,10 @@ import com.elmakers.mine.bukkit.api.effect.SoundEffect;
 import com.elmakers.mine.bukkit.api.event.WandActivatedEvent;
 import com.elmakers.mine.bukkit.api.event.WandDeactivatedEvent;
 import com.elmakers.mine.bukkit.api.integration.ClientPlatform;
-import com.elmakers.mine.bukkit.api.magic.CastSourceLocation;
-import com.elmakers.mine.bukkit.api.magic.MagicAttribute;
-import com.elmakers.mine.bukkit.api.magic.MaterialSet;
 import com.elmakers.mine.bukkit.api.magic.Messages;
-import com.elmakers.mine.bukkit.api.magic.ProgressionPath;
-import com.elmakers.mine.bukkit.api.magic.Trigger;
+import com.elmakers.mine.bukkit.api.magic.*;
 import com.elmakers.mine.bukkit.api.rp.ResourcePackPreference;
-import com.elmakers.mine.bukkit.api.spell.CastParameter;
-import com.elmakers.mine.bukkit.api.spell.CastingCost;
-import com.elmakers.mine.bukkit.api.spell.CostReducer;
-import com.elmakers.mine.bukkit.api.spell.MageSpell;
-import com.elmakers.mine.bukkit.api.spell.Spell;
-import com.elmakers.mine.bukkit.api.spell.SpellEventType;
-import com.elmakers.mine.bukkit.api.spell.SpellResult;
-import com.elmakers.mine.bukkit.api.spell.SpellTemplate;
+import com.elmakers.mine.bukkit.api.spell.*;
 import com.elmakers.mine.bukkit.api.wand.LostWand;
 import com.elmakers.mine.bukkit.api.wand.WandAction;
 import com.elmakers.mine.bukkit.api.wand.WandTemplate;
@@ -118,29 +41,54 @@ import com.elmakers.mine.bukkit.materials.MaterialSets;
 import com.elmakers.mine.bukkit.spell.ActionSpell;
 import com.elmakers.mine.bukkit.spell.BaseSpell;
 import com.elmakers.mine.bukkit.spell.TriggeredSpell;
-import com.elmakers.mine.bukkit.tasks.ArmorUpdatedTask;
-import com.elmakers.mine.bukkit.tasks.CheckWandTask;
-import com.elmakers.mine.bukkit.tasks.MageFinishLoadTask;
-import com.elmakers.mine.bukkit.tasks.SendCurrencyMessageTask;
-import com.elmakers.mine.bukkit.tasks.TeleportTask;
-import com.elmakers.mine.bukkit.utility.ActionBarSender;
-import com.elmakers.mine.bukkit.utility.BukkitMetadataUtils;
-import com.elmakers.mine.bukkit.utility.CompatibilityConstants;
-import com.elmakers.mine.bukkit.utility.CompatibilityLib;
-import com.elmakers.mine.bukkit.utility.ConfigurationUtils;
-import com.elmakers.mine.bukkit.utility.CurrencyAmount;
-import com.elmakers.mine.bukkit.utility.QueueSet;
-import com.elmakers.mine.bukkit.utility.Replacer;
-import com.elmakers.mine.bukkit.utility.TextUtils;
-import com.elmakers.mine.bukkit.wand.ActiveWandSet;
-import com.elmakers.mine.bukkit.wand.Wand;
-import com.elmakers.mine.bukkit.wand.WandMode;
-import com.elmakers.mine.bukkit.wand.WandProperties;
-import com.elmakers.mine.bukkit.wand.WandSet;
+import com.elmakers.mine.bukkit.tasks.*;
+import com.elmakers.mine.bukkit.utility.*;
+import com.elmakers.mine.bukkit.wand.*;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
-
 import de.slikey.effectlib.util.VectorUtils;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.command.BlockCommandSender;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.*;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.logging.Level;
+
+import static com.google.common.base.Verify.verifyNotNull;
 
 public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mage, Replacer, ActionBarSender {
     protected static int AUTOMATA_ONLINE_TIMEOUT = 5000;
@@ -296,6 +244,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     private Float restoreExperience;
     private Integer restoreLevel;
     private boolean virtualExperience = false;
+    private boolean virtualManaExperience = false;
     private float virtualExperienceProgress = 0.0f;
     private int virtualExperienceLevel = 0;
     private boolean glidingAllowed = false;
@@ -452,10 +401,10 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     public void onDeath(EntityDeathEvent event) {
-        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext();) {
+        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext(); ) {
             Batch batch = iterator.next();
             if (!(batch instanceof SpellBatch)) continue;
-            SpellBatch spellBatch = (SpellBatch)batch;
+            SpellBatch spellBatch = (SpellBatch) batch;
             Spell spell = spellBatch.getSpell();
             if (spell.cancelOnDeath()) {
                 batch.cancel();
@@ -510,12 +459,12 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
         LivingEntity li = getLivingEntity();
         if (li != null && li instanceof Creature && target instanceof LivingEntity) {
-            Creature creature = ((Creature)li);
+            Creature creature = ((Creature) li);
             if (creature.getTarget() != target) {
                 sendDebugMessage("Now targeting " + target.getName(), 6);
             }
 
-            creature.setTarget((LivingEntity)target);
+            creature.setTarget((LivingEntity) target);
         }
     }
 
@@ -662,7 +611,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                     if (li != null) {
                         scale = event.getDamage() / CompatibilityLib.getCompatibilityUtils().getMaxHealth(li);
                     }
-                    fallingSpell.playEffects("land", (float)scale, getLocation().getBlock().getRelative(BlockFace.DOWN));
+                    fallingSpell.playEffects("land", (float) scale, getLocation().getBlock().getRelative(BlockFace.DOWN));
                 }
                 if (fallProtectionCount <= 0) {
                     fallProtection = 0;
@@ -752,14 +701,13 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         }
 
         if (damage > 0) {
-            for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext();) {
+            for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext(); ) {
                 Batch batch = iterator.next();
                 if (!(batch instanceof SpellBatch)) continue;
-                SpellBatch spellBatch = (SpellBatch)batch;
+                SpellBatch spellBatch = (SpellBatch) batch;
                 Spell spell = spellBatch.getSpell();
                 double cancelOnDamage = spell.cancelOnDamage();
-                if (cancelOnDamage > 0 && cancelOnDamage < damage)
-                {
+                if (cancelOnDamage > 0 && cancelOnDamage < damage) {
                     batch.cancel();
                     iterator.remove();
                 }
@@ -804,13 +752,12 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
     public void checkActiveSpells(Wand wand) {
         // This handles any spells that are running now
-        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext();) {
+        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext(); ) {
             Batch batch = iterator.next();
             if (!(batch instanceof SpellBatch)) continue;
-            SpellBatch spellBatch = (SpellBatch)batch;
+            SpellBatch spellBatch = (SpellBatch) batch;
             Spell spell = spellBatch.getSpell();
-            if (spell.cancelOnNoWand() && spell.getCurrentCast().getWand() == wand)
-            {
+            if (spell.cancelOnNoWand() && spell.getCurrentCast().getWand() == wand) {
                 batch.cancel();
                 iterator.remove();
             }
@@ -851,10 +798,10 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     public void onTeleport(PlayerTeleportEvent event) {
-        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext();) {
+        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext(); ) {
             Batch batch = iterator.next();
             if (!(batch instanceof SpellBatch)) continue;
-            SpellBatch spellBatch = (SpellBatch)batch;
+            SpellBatch spellBatch = (SpellBatch) batch;
             Spell spell = spellBatch.getSpell();
             if (spell.cancelOnWorldChange()) {
                 batch.cancel();
@@ -887,8 +834,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         }
     }
 
-    public void activateIcon(Wand activeWand, ItemStack icon)
-    {
+    public void activateIcon(Wand activeWand, ItemStack icon) {
         if (System.currentTimeMillis() < ignoreItemActivationUntil) {
             return;
         }
@@ -952,8 +898,8 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
     @Override
     public boolean tryToOwn(com.elmakers.mine.bukkit.api.wand.Wand wand) {
-        if (isPlayer() && wand instanceof Wand && ((Wand)wand).tryToOwn(getPlayer())) {
-            addBound((Wand)wand);
+        if (isPlayer() && wand instanceof Wand && ((Wand) wand).tryToOwn(getPlayer())) {
+            addBound((Wand) wand);
             return true;
         }
 
@@ -965,7 +911,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         if (template != null && template.isRestorable()) {
             String templateKey = template.getKey();
             if (templateKey != null && !templateKey.isEmpty()) {
-                boundWands.put(templateKey, (Wand)wand.duplicate());
+                boundWands.put(templateKey, (Wand) wand.duplicate());
             }
         }
     }
@@ -1049,8 +995,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             undoList.updateScheduledUndo();
         }
 
-        if (!undoList.hasBeenScheduled() && undoList.isScheduled())
-        {
+        if (!undoList.hasBeenScheduled() && undoList.isScheduled()) {
             if (undoList.hasChanges()) {
                 controller.scheduleUndo(undoList);
             } else {
@@ -1207,8 +1152,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
             // Re-activate wand if it was active on logout
             checkWand();
-            if (activeWand != null && restoreOpenWand && !activeWand.isInventoryOpen() && REOPEN_WAND_ON_JOIN)
-            {
+            if (activeWand != null && restoreOpenWand && !activeWand.isInventoryOpen() && REOPEN_WAND_ON_JOIN) {
                 activeWand.openInventory();
             }
             restoreOpenWand = false;
@@ -1513,9 +1457,9 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
     @Override
     public @Nonnull Collection<com.elmakers.mine.bukkit.api.magic.MageClass> getClasses() {
-       List<com.elmakers.mine.bukkit.api.magic.MageClass> mageClasses = new ArrayList<>();
-       mageClasses.addAll(classes.values());
-       return mageClasses;
+        List<com.elmakers.mine.bukkit.api.magic.MageClass> mageClasses = new ArrayList<>();
+        mageClasses.addAll(classes.values());
+        return mageClasses;
     }
 
     @Override
@@ -1680,10 +1624,8 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         if (entity == null) return;
 
         Collection<PotionEffect> activeEffects = entity.getActivePotionEffects();
-        for (PotionEffect effect : activeEffects)
-        {
-            if (effect.getDuration() > Integer.MAX_VALUE / 2)
-            {
+        for (PotionEffect effect : activeEffects) {
+            if (effect.getDuration() > Integer.MAX_VALUE / 2) {
                 entity.removePotionEffect(effect.getType());
             }
         }
@@ -1722,8 +1664,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         if ((itemInHand != null && activeWandItem == null)
                 || (activeWandItem != null && itemInHand == null)
                 || (activeWandItem != null && itemInHand != null && !controller.isSameItem(activeWandItem, itemInHand))
-                )
-        {
+        ) {
             if (activeWand != null) {
                 activeWand.deactivate();
             }
@@ -1806,10 +1747,9 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         if (!isWand) itemInHand = null;
 
         if ((itemInHand != null && offhandWandItem == null)
-        || (offhandWandItem != null && itemInHand == null)
-        || (itemInHand != null && offhandWandItem != null && !itemInHand.equals(offhandWandItem))
-        )
-        {
+                || (offhandWandItem != null && itemInHand == null)
+                || (itemInHand != null && offhandWandItem != null && !itemInHand.equals(offhandWandItem))
+        ) {
             if (offhandWand != null) {
                 offhandWand.deactivate();
             }
@@ -1977,13 +1917,11 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             // Avoid getting kicked for large jump effects
             // It'd be nice to filter this by amplitude, but as
             // it turns out that is not easy to check efficiently.
-            if (JUMP_EFFECT_FLIGHT_EXEMPTION_DURATION > 0 && player.hasPotionEffect(PotionEffectType.JUMP))
-            {
+            if (JUMP_EFFECT_FLIGHT_EXEMPTION_DURATION > 0 && player.hasPotionEffect(PotionEffectType.JUMP)) {
                 controller.addFlightExemption(player, JUMP_EFFECT_FLIGHT_EXEMPTION_DURATION);
             }
 
-            for (Wand armorWand : activeArmor.values())
-            {
+            for (Wand armorWand : activeArmor.values()) {
                 armorWand.updateEffects(this);
             }
 
@@ -1996,11 +1934,23 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 }
             }
         }
+
+        Wand wand = getActiveWand();
+        if (wand == null) {
+            if (getMana() < getManaMax()) {
+                updateActionBar();
+            } else {
+                resetSentExperience();
+            }
+        } else if (virtualManaExperience) {
+            virtualManaExperience = false;
+            resetSentExperience();
+        }
     }
 
     public int processPendingBatches(int maxWorldAllowed) {
         int updated = 0;
-        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext();) {
+        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext(); ) {
             Batch batch = iterator.next();
             int batchUpdated = 0;
             boolean errored = false;
@@ -2040,7 +1990,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     protected void reloadClasses() {
-        for (Iterator<Map.Entry<String, MageClass>> it = classes.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, MageClass>> it = classes.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, MageClass> entry = it.next();
             String templateKey = entry.getKey();
             MageClass mageClass = entry.getValue();
@@ -2063,7 +2013,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     protected void reloadModifiers() {
-        for (Iterator<Map.Entry<String, MageModifier>> it = modifiers.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, MageModifier>> it = modifiers.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, MageModifier> entry = it.next();
             String templateKey = entry.getKey();
             MageModifier modifier = entry.getValue();
@@ -2081,7 +2031,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     protected void reloadAttributes() {
-        for (Iterator<Map.Entry<String, MageClass>> it = classes.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, MageClass>> it = classes.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, MageClass> entry = it.next();
             MageClass mageClass = entry.getValue();
             if (!mageClass.isLocked()) {
@@ -2090,7 +2040,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             }
         }
 
-        for (Iterator<Map.Entry<String, MageModifier>> it = modifiers.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, MageModifier>> it = modifiers.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, MageModifier> entry = it.next();
             MageModifier modifier = entry.getValue();
             modifier.deactivate();
@@ -2107,8 +2057,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             if (spellConfiguration.contains(key)) {
                 ConfigurationSection template = spellConfiguration.getConfigurationSection(key);
                 String className = template.getString("class");
-                if (className == null)
-                {
+                if (className == null) {
                     className = ActionSpell.class.getName();
                 }
                 // Check for spells that have changed class
@@ -2150,7 +2099,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         }
 
         if (entity instanceof Player) {
-            return ((Player)entity).getDisplayName();
+            return ((Player) entity).getDisplayName();
         }
 
         return controller.getEntityDisplayName(entity);
@@ -2222,13 +2171,13 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
         boolean leftHand = isInOffhand;
         if (entity instanceof HumanEntity) {
-            HumanEntity human = (HumanEntity)entity;
+            HumanEntity human = (HumanEntity) entity;
             if (human.getMainHand() == MainHand.LEFT) {
                 leftHand = !leftHand;
             }
         }
         double sneakOffset = 0;
-        if (entity instanceof Player && ((Player)entity).isSneaking()) {
+        if (entity instanceof Player && ((Player) entity).isSneaking()) {
             sneakOffset = SNEAKING_CAST_OFFSET;
         }
 
@@ -2320,7 +2269,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                     if (!(batch instanceof SpellBatch)) {
                         continue;
                     }
-                    SpellBatch spellBatch = (SpellBatch)batch;
+                    SpellBatch spellBatch = (SpellBatch) batch;
                     Spell spell = spellBatch.getSpell();
                     if (spell == null) {
                         continue;
@@ -2337,7 +2286,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 }
                 if (exceptSpellKey != null) {
                     if (batch instanceof SpellBatch) {
-                        SpellBatch spellBatch = (SpellBatch)batch;
+                        SpellBatch spellBatch = (SpellBatch) batch;
                         Spell spell = spellBatch.getSpell();
                         if (spell != null && spell.getSpellKey().getBaseKey().equalsIgnoreCase(exceptSpellKey)) {
                             continue;
@@ -2369,7 +2318,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             batches.addAll(pendingBatches);
             for (Batch batch : batches) {
                 if (batch instanceof UndoBatch) {
-                    ((UndoBatch)batch).complete();
+                    ((UndoBatch) batch).complete();
                     pendingBatches.remove(batch);
                     finished++;
                 }
@@ -2560,8 +2509,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     @Override
     public long getRemainingCooldown() {
         long remaining = 0;
-        if (cooldownExpiration > 0)
-        {
+        if (cooldownExpiration > 0) {
             long now = System.currentTimeMillis();
             if (cooldownExpiration > now) {
                 remaining = cooldownExpiration - now;
@@ -3033,7 +2981,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         CurrencyAmount currency = CompatibilityLib.getInventoryUtils().getCurrencyAmount(itemStack);
         if (currency != null) {
             int amount = currency.getAmount() <= 0 ? 1 : currency.getAmount();
-            return (int)Math.ceil(getCurrency(currency.getType()) / amount);
+            return (int) Math.ceil(getCurrency(currency.getType()) / amount);
         }
 
         int amount = 0;
@@ -3124,7 +3072,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             double attackMultiplier = controller.getMaxAttackMultiplier("overall");
             if (attackMultiplier > 1) {
                 attackMultiplier = 1.0 + (attackMultiplier - 1.0) * overallMultiplier;
-                multiplier = (float)(multiplier * attackMultiplier);
+                multiplier = (float) (multiplier * attackMultiplier);
             }
         }
         return Math.max(0, multiplier);
@@ -3262,7 +3210,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         while ((expProgress > 0 || expLevel > 0) && xp > 0) {
             if (expProgress > 0) {
                 float expToLevel = Wand.getExpToLevel(expLevel);
-                int expAtLevel = (int)(expProgress * expToLevel);
+                int expAtLevel = (int) (expProgress * expToLevel);
                 if (expAtLevel > xp) {
                     expAtLevel -= xp;
                     xp = 0;
@@ -3275,7 +3223,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 xp -= Wand.getExpToLevel(expLevel - 1);
                 expLevel--;
                 if (xp < 0) {
-                    expProgress = (float)-xp / Wand.getExpToLevel(expLevel);
+                    expProgress = (float) -xp / Wand.getExpToLevel(expLevel);
                     xp = 0;
                 }
             }
@@ -3465,7 +3413,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     public void enableFallProtection(int ms, int count, @Nullable Spell protector) {
         if (ms <= 0 || count <= 0) return;
         if (protector != null && protector instanceof BaseSpell) {
-            this.fallingSpell = (BaseSpell)protector;
+            this.fallingSpell = (BaseSpell) protector;
         }
 
         long nextTime = System.currentTimeMillis() + ms;
@@ -3538,12 +3486,12 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
         if (entity == null || !entity.isValid()) return false;
         if (!isNPC && entity instanceof Player) {
-            Player player = (Player)entity;
+            Player player = (Player) entity;
             return player.isOnline();
         }
 
         if (entity instanceof LivingEntity) {
-            LivingEntity living = (LivingEntity)entity;
+            LivingEntity living = (LivingEntity) entity;
             return !living.isDead();
         }
 
@@ -3623,8 +3571,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         return data;
     }
 
-    public void onGUIDeactivate()
-    {
+    public void onGUIDeactivate() {
         GUIAction previousGUI = gui;
         gui = null;
         Player player = getPlayer();
@@ -3632,18 +3579,15 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             CompatibilityLib.getDeprecatedUtils().updateInventory(player);
         }
 
-        if (previousGUI != null)
-        {
+        if (previousGUI != null) {
             previousGUI.deactivated();
         }
     }
 
     @Override
-    public void activateGUI(GUIAction action, Inventory inventory)
-    {
+    public void activateGUI(GUIAction action, Inventory inventory) {
         Player player = getPlayer();
-        if (player != null)
-        {
+        if (player != null) {
             controller.disableItemSpawn();
             try {
                 player.closeInventory();
@@ -3660,11 +3604,9 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     @Override
-    public void continueGUI(GUIAction action, Inventory inventory)
-    {
+    public void continueGUI(GUIAction action, Inventory inventory) {
         Player player = getPlayer();
-        if (player != null)
-        {
+        if (player != null) {
             controller.disableItemSpawn();
             try {
                 if (inventory != null) {
@@ -3680,14 +3622,12 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     @Override
-    public void deactivateGUI()
-    {
+    public void deactivateGUI() {
         activateGUI(null, null);
     }
 
     @Override
-    public GUIAction getActiveGUI()
-    {
+    public GUIAction getActiveGUI() {
         return gui;
     }
 
@@ -3743,7 +3683,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             }
         }
         if (entity instanceof Creature) {
-            Creature creature = (Creature)entity;
+            Creature creature = (Creature) entity;
             Entity currentTarget = creature.getTarget();
             if (currentTarget != null) {
                 String mobName = currentTarget.getCustomName();
@@ -3772,9 +3712,9 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         sender.sendMessage(ChatColor.GOLD + "Permission check for " + ChatColor.AQUA + getDisplayName());
         sender.sendMessage(ChatColor.GOLD + "  id " + ChatColor.DARK_AQUA + getId());
         sender.sendMessage(ChatColor.YELLOW + " On " + ChatColor.GRAY
-            + location.getBlock().getRelative(BlockFace.DOWN).getType().name().toLowerCase()
-            + ChatColor.YELLOW + " at " + TextUtils.printBlockLocation(location)
-            + " " + ChatColor.DARK_BLUE + location.getWorld().getName());
+                + location.getBlock().getRelative(BlockFace.DOWN).getType().name().toLowerCase()
+                + ChatColor.YELLOW + " at " + TextUtils.printBlockLocation(location)
+                + " " + ChatColor.DARK_BLUE + location.getWorld().getName());
 
         Player player = getPlayer();
         boolean hasBypass = false;
@@ -3785,8 +3725,8 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             Block lookingAt = player.getTargetBlock(new HashSet<>(controller.getMaterialSetManager().getMaterialSet("all_air").getMaterials()), 128);
             if (lookingAt != null) {
                 sender.sendMessage(ChatColor.YELLOW + " Looking at " + ChatColor.GRAY
-                    + lookingAt.getType().name().toLowerCase()
-                    + ChatColor.YELLOW + " at " + TextUtils.printBlockLocation(location));
+                        + lookingAt.getType().name().toLowerCase()
+                        + ChatColor.YELLOW + " at " + TextUtils.printBlockLocation(location));
             }
             hasBypass = controller.hasBypassPermission(player);
             hasPVPBypass = player.hasPermission("magic.bypass_pvp");
@@ -3810,16 +3750,14 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         double borderSize = border.getSize();
 
         // Kind of a hack, meant to prevent this from showing up when there's no border defined
-        if (borderSize < 50000000)
-        {
+        if (borderSize < 50000000) {
             borderSize = borderSize / 2 - border.getWarningDistance();
             Location offset = location.subtract(border.getCenter());
             boolean isOutsideBorder = (offset.getX() < -borderSize || offset.getX() > borderSize || offset.getZ() < -borderSize || offset.getZ() > borderSize);
             sender.sendMessage(ChatColor.AQUA + " Is in world border (" + ChatColor.GRAY + borderSize + ChatColor.AQUA + "): " + formatBoolean(!isOutsideBorder, true, false));
         }
 
-        if (spell != null)
-        {
+        if (spell != null) {
             sender.sendMessage(ChatColor.AQUA + " Has pnode " + ChatColor.GOLD + spell.getPermissionNode() + ChatColor.AQUA + ": " + formatBoolean(spell.hasCastPermission(player), hasBypass ? null : true));
             sender.sendMessage(ChatColor.AQUA + " Region override: " + formatBoolean(controller.getRegionCastPermission(player, spell, location), hasBypass ? null : true));
             sender.sendMessage(ChatColor.AQUA + " Field override: " + formatBoolean(controller.getPersonalCastPermission(player, spell, location), hasBypass ? null : true));
@@ -3831,34 +3769,29 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             sender.sendMessage(ChatColor.GOLD + " " + spell.getName() + ChatColor.AQUA + " requires break: " + formatBoolean(spell.requiresBreakPermission(), null, true, true));
             sender.sendMessage(ChatColor.GOLD + " " + spell.getName() + ChatColor.AQUA + " requires pvp: " + formatBoolean(spell.isPvpRestricted(), null, true, true));
             sender.sendMessage(ChatColor.GOLD + " " + spell.getName() + ChatColor.AQUA + " allowed while disguised: " + formatBoolean(!spell.isDisguiseRestricted(), null, false, true));
-            if (spell instanceof BaseSpell)
-            {
-                boolean buildPermission = ((BaseSpell)spell).hasBuildPermission(location.getBlock());
+            if (spell instanceof BaseSpell) {
+                boolean buildPermission = ((BaseSpell) spell).hasBuildPermission(location.getBlock());
                 sender.sendMessage(ChatColor.GOLD + " " + spell.getName() + ChatColor.AQUA + " has build: " + formatBoolean(buildPermission, hasBuildBypass || !spell.requiresBuildPermission() ? null : true));
-                boolean breakPermission = ((BaseSpell)spell).hasBreakPermission(location.getBlock());
+                boolean breakPermission = ((BaseSpell) spell).hasBreakPermission(location.getBlock());
                 sender.sendMessage(ChatColor.GOLD + " " + spell.getName() + ChatColor.AQUA + " has break: " + formatBoolean(breakPermission, hasBreakBypass || !spell.requiresBreakPermission() ? null : true));
             }
             sender.sendMessage(ChatColor.AQUA + " Can cast " + ChatColor.GOLD + spell.getName() + ChatColor.AQUA + ": " + formatBoolean(spell.canCast(location)));
         }
     }
 
-    public static String formatBoolean(Boolean flag, Boolean greenState)
-    {
+    public static String formatBoolean(Boolean flag, Boolean greenState) {
         return formatBoolean(flag, greenState, greenState == null ? null : !greenState, false);
     }
 
-    public static String formatBoolean(Boolean flag)
-    {
+    public static String formatBoolean(Boolean flag) {
         return formatBoolean(flag, true, false, false);
     }
 
-    public static String formatBoolean(Boolean flag, Boolean greenState, Boolean redState)
-    {
+    public static String formatBoolean(Boolean flag, Boolean greenState, Boolean redState) {
         return formatBoolean(flag, greenState, redState, false);
     }
 
-    public static String formatBoolean(Boolean flag, Boolean greenState, Boolean redState, boolean dark)
-    {
+    public static String formatBoolean(Boolean flag, Boolean greenState, Boolean redState, boolean dark) {
         if (flag == null) {
             return ChatColor.GRAY + "none";
         }
@@ -3931,7 +3864,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 ItemStack existing = armor[index];
                 if (!CompatibilityLib.getItemUtils().isEmpty(existing)) {
                     controller.info("*** Restoring armor " + TextUtils.nameItem(item)
-                        + " in slot " + index + " but found item " + TextUtils.nameItem(existing), 18);
+                            + " in slot " + index + " but found item " + TextUtils.nameItem(existing), 18);
                     if (addToInventory == null) {
                         addToInventory = new ArrayList<>();
                     }
@@ -3963,7 +3896,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 ItemStack existing = inventory.getItem(slot);
                 if (!CompatibilityLib.getItemUtils().isEmpty(existing)) {
                     controller.info("*** Restoring item " + TextUtils.nameItem(item)
-                        + " in slot " + slot + " but found item " + TextUtils.nameItem(existing), 18);
+                            + " in slot " + slot + " but found item " + TextUtils.nameItem(existing), 18);
                     if (addToInventory == null) {
                         addToInventory = new ArrayList<>();
                     }
@@ -3980,7 +3913,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 Map<Integer, ItemStack> returned = inventory.addItem(item);
                 if (!returned.isEmpty()) {
                     controller.info("*** Restoring item " + TextUtils.nameItem(item)
-                        + " but inventory was full, dropping", 18);
+                            + " but inventory was full, dropping", 18);
                     player.getWorld().dropItem(player.getLocation(), item);
                 }
             }
@@ -4164,8 +4097,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     public void armorUpdated() {
         activeArmor.clear();
         Player player = getPlayer();
-        if (player != null)
-        {
+        if (player != null) {
             boolean changed = false;
             ItemStack[] armor = player.getInventory().getArmorContents();
             for (int index = 0; index < armor.length; index++) {
@@ -4195,9 +4127,9 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     }
 
     protected void addPassiveEffectsGroup(Map<String, Double> properties, CasterProperties addProperties, String section, boolean stack, double maxValue) {
-       ConfigurationSection addSection = addProperties.getConfigurationSection(section);
-       if (addSection != null) {
-           Set<String> sectionTypes = addSection.getKeys(false);
+        ConfigurationSection addSection = addProperties.getConfigurationSection(section);
+        if (addSection != null) {
+            Set<String> sectionTypes = addSection.getKeys(false);
             for (String sectionType : sectionTypes) {
                 Double existing = properties.get(sectionType);
                 if (existing == null) {
@@ -4211,7 +4143,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 }
                 properties.put(sectionType, existing);
             }
-       }
+        }
     }
 
     protected void addPassiveAttributes(CasterProperties properties) {
@@ -4600,24 +4532,20 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             addPassiveEffects(modifier, true);
         }
 
-        if (activeWand != null && !activeWand.isWorn())
-        {
+        if (activeWand != null && !activeWand.isWorn()) {
             addPassiveEffects(activeWand, false);
         }
         // Don't add these together so things stay balanced!
-        if (offhandWand != null && !offhandWand.isWorn())
-        {
+        if (offhandWand != null && !offhandWand.isWorn()) {
             addPassiveEffects(offhandWand, false);
         }
-        for (Wand armorWand : activeArmor.values())
-        {
+        for (Wand armorWand : activeArmor.values()) {
             if (armorWand != null) {
                 addPassiveEffects(armorWand, false);
             }
         }
 
-        if (entity != null)
-        {
+        if (entity != null) {
             for (PotionEffectType effectType : currentEffects) {
                 if (!effectivePotionEffects.containsKey(effectType)) {
                     entity.removePotionEffect(effectType);
@@ -4629,7 +4557,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             }
             // Avoid resetting health scale that may have been set by other plugins
             if (entity instanceof Player) {
-                Player player = (Player)entity;
+                Player player = (Player) entity;
                 EffectPlayer.ignorePlayer(player, ignoreParticles);
                 if (previousHealthScale != healthScale) {
                     if (healthScale > 0) {
@@ -4666,25 +4594,24 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         this.preventDismount = prevent;
     }
 
-    public Collection<Wand> getActiveArmor()
-    {
+    public Collection<Wand> getActiveArmor() {
         return activeArmor.values();
     }
 
     public void flagForReactivation() {
         restoreOpenWand = activeWand != null && activeWand.isInventoryOpen();
-        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext();) {
+        for (Iterator<Batch> iterator = pendingBatches.iterator(); iterator.hasNext(); ) {
             Batch batch = iterator.next();
             if (!(batch instanceof SpellBatch)) continue;
-            SpellBatch spellBatch = (SpellBatch)batch;
+            SpellBatch spellBatch = (SpellBatch) batch;
             Spell spell = spellBatch.getSpell();
             if (spell instanceof BaseSpell) {
-                ((BaseSpell)spell).flagForReactivation();
+                ((BaseSpell) spell).flagForReactivation();
             }
         }
         for (MageSpell spell : activeSpells) {
             if (spell instanceof BaseSpell) {
-                ((BaseSpell)spell).flagForReactivation();
+                ((BaseSpell) spell).flagForReactivation();
             }
         }
     }
@@ -4737,28 +4664,23 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
-        for (int index = 0; index < contents.length; index++)
-        {
+        for (int index = 0; index < contents.length; index++) {
             ItemStack item = contents[index];
-            if (item != null && item.getType() != Material.AIR && CompatibilityLib.getNBTUtils().containsTag(item, tag))
-            {
+            if (item != null && item.getType() != Material.AIR && CompatibilityLib.getNBTUtils().containsTag(item, tag)) {
                 inventory.setItem(index, null);
             }
         }
 
         boolean modified = false;
         ItemStack[] armor = inventory.getArmorContents();
-        for (int index = 0; index < armor.length; index++)
-        {
+        for (int index = 0; index < armor.length; index++) {
             ItemStack item = armor[index];
-            if (item != null && item.getType() != Material.AIR && CompatibilityLib.getNBTUtils().containsTag(item, tag))
-            {
+            if (item != null && item.getType() != Material.AIR && CompatibilityLib.getNBTUtils().containsTag(item, tag)) {
                 modified = true;
                 armor[index] = null;
             }
         }
-        if (modified)
-        {
+        if (modified) {
             inventory.setArmorContents(armor);
         }
     }
@@ -4933,7 +4855,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
     @Override
     public int getSkillPoints() {
-        return (int)getCurrency("sp");
+        return (int) getCurrency("sp");
     }
 
     @Override
@@ -5000,7 +4922,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                     Spell spell = getSpell(spellKey);
                     if (spell != null && spell instanceof BaseSpell) {
                         Long timeToCast = null;
-                        BaseSpell baseSpell = (BaseSpell)spell;
+                        BaseSpell baseSpell = (BaseSpell) spell;
                         int targetAmount = 1;
                         MageClass mageClass = null;
                         if (classKey != null && !classKey.isEmpty()) {
@@ -5019,7 +4941,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                         if (!canCastSpell) {
                             targetAmount = 1;
                         } else {
-                            targetAmount = (int)Math.ceil((double)timeToCast / 1000);
+                            targetAmount = (int) Math.ceil((double) timeToCast / 1000);
                         }
                         targetAmount = Math.max(Math.min(targetAmount, 99), 1);
                         ItemStack newItem = baseSpell.updateItem(spellItem, canCast);
@@ -5064,7 +4986,8 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         if (blockFOV > 0 && angle > blockFOV) return false;
         if (reflectFOV > 0 && angle > reflectFOV) return false;
         long now = System.currentTimeMillis();
-        if (reflectChance == 0 && blockCooldown > 0 && lastBlockTime > 0 && lastBlockTime + blockCooldown > now) return false;
+        if (reflectChance == 0 && blockCooldown > 0 && lastBlockTime > 0 && lastBlockTime + blockCooldown > now)
+            return false;
         if (reflectCooldown > 0 && lastReflectTime > 0 && lastReflectTime + reflectCooldown > now) return false;
         double r = Math.random();
         if (blockReflectChance > 0 && r > blockReflectChance) return false;
@@ -5078,13 +5001,13 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     @Override
     @Deprecated
     public float getSPMultiplier() {
-        return (float)getEarnMultiplier("sp");
+        return (float) getEarnMultiplier("sp");
     }
 
     @Override
     @Deprecated
     public float getEarnMultiplier() {
-        return (float)getEarnMultiplier("sp");
+        return (float) getEarnMultiplier("sp");
     }
 
     @Override
@@ -5258,15 +5181,15 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         switch (attributeKey) {
             case "air": {
                 LivingEntity living = getLivingEntity();
-                return living == null ? null : (double)living.getRemainingAir();
+                return living == null ? null : (double) living.getRemainingAir();
             }
             case "air_max": {
                 LivingEntity living = getLivingEntity();
-                return living == null ? null : (double)living.getMaximumAir();
+                return living == null ? null : (double) living.getMaximumAir();
             }
             case "hunger": {
                 Player player = getPlayer();
-                return player == null ? null : (double)player.getFoodLevel();
+                return player == null ? null : (double) player.getFoodLevel();
             }
             case "health": {
                 LivingEntity living = getLivingEntity();
@@ -5276,19 +5199,29 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 LivingEntity living = getLivingEntity();
                 return living == null ? null : CompatibilityLib.getCompatibilityUtils().getMaxHealth(living);
             }
-            case "armor": return getVanillaAttribute(Attribute.GENERIC_ARMOR);
-            case "attack_damage":  return getVanillaAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-            case "luck": return getVanillaAttribute(Attribute.GENERIC_LUCK);
-            case "knockback_resistance": return getVanillaAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-            case "movement_speed": return getVanillaAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-            case "movement_speed_bps": return getVanillaAttribute(Attribute.GENERIC_MOVEMENT_SPEED) * MOVEMENT_SPEED_BPS;
-            case "mana": return (double)getMana();
-            case "mana_max": return (double)getEffectiveManaMax();
-            case "xp": return (double)getExperience();
-            case "level": return (double)getLevel();
+            case "armor":
+                return getVanillaAttribute(Attribute.GENERIC_ARMOR);
+            case "attack_damage":
+                return getVanillaAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+            case "luck":
+                return getVanillaAttribute(Attribute.GENERIC_LUCK);
+            case "knockback_resistance":
+                return getVanillaAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+            case "movement_speed":
+                return getVanillaAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+            case "movement_speed_bps":
+                return getVanillaAttribute(Attribute.GENERIC_MOVEMENT_SPEED) * MOVEMENT_SPEED_BPS;
+            case "mana":
+                return (double) getMana();
+            case "mana_max":
+                return (double) getEffectiveManaMax();
+            case "xp":
+                return (double) getExperience();
+            case "level":
+                return (double) getLevel();
             case "time": {
                 Location location = getLocation();
-                return location == null ? null : (double)location.getWorld().getTime();
+                return location == null ? null : (double) location.getWorld().getTime();
             }
             case "fulltime": {
                 Location location = getLocation();
@@ -5296,7 +5229,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             }
             case "moon": {
                 Location location = getLocation();
-                return location == null ? null : (double)(int)((location.getWorld().getFullTime() / 24000) % 8);
+                return location == null ? null : (double) (int) ((location.getWorld().getFullTime() / 24000) % 8);
             }
             case "location_x": {
                 Location location = getLocation();
@@ -5312,11 +5245,11 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
             }
             case "yaw": {
                 Location location = getLocation();
-                return location == null ? null : (double)location.getYaw();
+                return location == null ? null : (double) location.getYaw();
             }
             case "pitch": {
                 Location location = getLocation();
-                return location == null ? null : (double)location.getPitch();
+                return location == null ? null : (double) location.getPitch();
             }
             case "temperature": {
                 Location location = getLocation();
@@ -5347,12 +5280,12 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 return lastFallDistance;
             }
             case "bowpower": {
-                return (double)getLastBowPower();
+                return (double) getLastBowPower();
             }
             case "play_time": {
                 Player player = getPlayer();
                 if (player == null) return null;
-                return (double)(System.currentTimeMillis() - player.getFirstPlayed());
+                return (double) (System.currentTimeMillis() - player.getFirstPlayed());
             }
 
             default:
@@ -5382,7 +5315,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                     if (potionEffectType != null) {
                         for (PotionEffect effect : living.getActivePotionEffects()) {
                             if (effect.getType() == potionEffectType) {
-                                return (double)effect.getAmplifier() + 1;
+                                return (double) effect.getAmplifier() + 1;
                             }
                         }
                         return 0.0;
@@ -5762,7 +5695,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         return modifier;
     }
 
-    public MageModifier  unapplyModifier(@Nonnull String key) {
+    public MageModifier unapplyModifier(@Nonnull String key) {
         MageModifier modifier = modifiers.remove(key);
         if (modifier != null) {
             modifier.onRemoved();
@@ -5792,6 +5725,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
      * -1 : Main hand
      * -2 : Offhand
      * >=0 : Inventory slot
+     *
      * @return null if the player is not holding an arrow
      */
     @Nullable
@@ -6007,7 +5941,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
 
     @Override
     public boolean canUse(com.elmakers.mine.bukkit.api.wand.Wand apiWand) {
-        Wand wand = apiWand instanceof Wand ? (Wand)apiWand : null;
+        Wand wand = apiWand instanceof Wand ? (Wand) apiWand : null;
         return canUse(wand.getItem(), wand);
     }
 
@@ -6042,8 +5976,10 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     public String getReplacement(String symbol, boolean integerValues) {
         CasterProperties casterProperties = getActiveProperties();
         switch (symbol) {
-            case "_": return " ";
-            case "pd": return getDisplayName();
+            case "_":
+                return " ";
+            case "pd":
+                return getDisplayName();
             case "pn":
             case "p":
                 return getName();
@@ -6069,8 +6005,10 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 }
                 return spell == null ? null : spell.getName();
             }
-            case "wand": return activeWand == null ? null : activeWand.getName();
-            case "class": return activeClass == null ? null : activeClass.getName();
+            case "wand":
+                return activeWand == null ? null : activeWand.getName();
+            case "class":
+                return activeClass == null ? null : activeClass.getName();
             case "path":
                 ProgressionPath path = casterProperties.getPath();
                 return path == null ? "" : path.getName();
@@ -6088,7 +6026,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
                 }
                 if (value != null) {
                     if (integerValues) {
-                        return Integer.toString((int)(double)value);
+                        return Integer.toString((int) (double) value);
                     } else {
                         return Double.toString(value);
                     }
@@ -6132,7 +6070,7 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
         if (player != null && controller.hasPermission(player, "magic.wand.craft")) {
             for (String recipe : recipes) {
                 if (controller.hasPermission(player, "magic.craft." + recipe)) {
-                    CompatibilityLib.getCompatibilityUtils().discoverRecipe(player,  recipe);
+                    CompatibilityLib.getCompatibilityUtils().discoverRecipe(player, recipe);
                 }
             }
         }
@@ -6310,5 +6248,27 @@ public class Mage implements CostReducer, com.elmakers.mine.bukkit.api.magic.Mag
     public void upgradeCheck() {
         CasterProperties properties = getActiveProperties();
         properties.checkUpgrade();
+    }
+
+    private static Wand EMPTY_WAND;
+
+    @Override
+    public void updateActionBar() {
+//        if (EMPTY_WAND == null) {
+//            EMPTY_WAND = (Wand) MagicPlugin.getAPI().createWand(MagicPlugin.getAPI().getController().getDefaultWandTemplate());
+//            EMPTY_WAND.setActionBarMana(true);
+//            EMPTY_WAND.setActionBarMessage("$hotbar`{font:\"default\",text:\" $extra\"}`");
+//            EMPTY_WAND.setActionBarOpenMessage("$hotbar`{font:\"default\",text:\" $extra\"}`");
+//        }
+//        EMPTY_WAND.setMage(this);
+//        EMPTY_WAND.setManaMax(getManaMax());
+//        EMPTY_WAND.updateMana();
+
+        double maxMana = getEffectiveManaMax();
+        float progress = (float) (getMana() / maxMana);
+        progress = Math.min(Math.max(0, progress), 1);
+        sendExperience(progress, 0);
+        virtualExperience = false;
+        virtualManaExperience = true;
     }
 }

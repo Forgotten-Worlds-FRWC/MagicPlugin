@@ -5758,6 +5758,9 @@ public class Wand extends WandProperties implements CostReducer, com.elmakers.mi
     public boolean activate(Mage mage, boolean offhand) {
         if (mage == null) return false;
         if (offhand && !allowOffhand) return false;
+
+        float prevMana = mage.getMana();
+
         mage.sendDebugMessage(ChatColor.YELLOW + "   Activating wand", 50);
         Player player = mage.getPlayer();
         if (player == null) return false;
@@ -5959,6 +5962,8 @@ public class Wand extends WandProperties implements CostReducer, com.elmakers.mi
         if (forceUpdate) {
             CompatibilityLib.getDeprecatedUtils().updateInventory(player);
         }
+
+        setMana(prevMana);
 
         return true;
     }
@@ -7463,5 +7468,17 @@ public class Wand extends WandProperties implements CostReducer, com.elmakers.mi
 
     public boolean allowOffhand() {
         return allowOffhand;
+    }
+
+    public void setActionBarMessage(String actionBarMessage) {
+        this.actionBarMessage = actionBarMessage;
+    }
+
+    public void setActionBarOpenMessage(String actionBarOpenMessage) {
+        this.actionBarOpenMessage = actionBarOpenMessage;
+    }
+
+    public void setActionBarMana(boolean actionBarMana) {
+        this.actionBarMana = actionBarMana;
     }
 }

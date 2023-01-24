@@ -96,7 +96,9 @@ public abstract class CasterProperties extends BaseMagicConfigurable implements 
                 manaController.setMana(getPlayer(), mana);
                 return;
             }
-            setProperty("mana", Math.max(0, mana));
+            if(getMana() != mana) {
+                setProperty("mana", Math.max(0, mana));
+            }
         }
     }
 
