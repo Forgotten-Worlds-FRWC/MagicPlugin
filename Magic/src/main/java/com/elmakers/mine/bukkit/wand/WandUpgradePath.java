@@ -1,38 +1,9 @@
 package com.elmakers.mine.bukkit.wand;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.util.NumberConversions;
-
 import com.elmakers.mine.bukkit.api.effect.EffectPlayer;
 import com.elmakers.mine.bukkit.api.event.PathUpgradeEvent;
 import com.elmakers.mine.bukkit.api.event.WandUpgradeEvent;
-import com.elmakers.mine.bukkit.api.magic.CasterProperties;
-import com.elmakers.mine.bukkit.api.magic.Mage;
-import com.elmakers.mine.bukkit.api.magic.MageClass;
-import com.elmakers.mine.bukkit.api.magic.MageController;
-import com.elmakers.mine.bukkit.api.magic.Messages;
-import com.elmakers.mine.bukkit.api.magic.ProgressionPath;
+import com.elmakers.mine.bukkit.api.magic.*;
 import com.elmakers.mine.bukkit.api.requirements.Requirement;
 import com.elmakers.mine.bukkit.api.spell.PrerequisiteSpell;
 import com.elmakers.mine.bukkit.api.spell.Spell;
@@ -46,7 +17,20 @@ import com.elmakers.mine.bukkit.utility.ConfigurationUtils;
 import com.elmakers.mine.bukkit.utility.TextUtils;
 import com.elmakers.mine.bukkit.utility.random.WeightedPair;
 import com.forgottenrunes.levels.api.LevelAPI;
-import com.forgottenrunes.levels.data.MageLevel;
+import com.forgottenrunes.levels.data.MageData;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.NumberConversions;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * A represents a randomized upgrade path that a wand may use
@@ -337,7 +321,7 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
                     nextLevelIndex = levelIndex + 1;
                     int previousLevel = levels[levelIndex];
                     int nextLevel = levels[nextLevelIndex];
-                    distance = (float)(level - previousLevel) / (float)(nextLevel - previousLevel);
+                    distance = (float) (level - previousLevel) / (float) (nextLevel - previousLevel);
                     break;
                 }
             }
@@ -421,7 +405,7 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         // New paths may be created here as placeholders when using "follows" for an unloaded set of configs.
         // So we must make a copy of the list to iterate over.
         List<WandUpgradePath> currentPaths = new ArrayList<>(paths.values());
-        for (WandUpgradePath path : currentPaths)  {
+        for (WandUpgradePath path : currentPaths) {
             path.loadFollows(controller, configuration);
         }
     }
@@ -447,8 +431,8 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
             ConfigurationSection followParameters = pathsConfiguration.getConfigurationSection(followsKey);
             if (followParameters != null && followParameters.contains("follows")) {
                 controller.getLogger().warning("Path " + key + " follows path " + followsKey + " which follows "
-                    + followParameters.getString("follows")
-                    + ", paths shouldn't follow paths that follow paths... probably. Consider re-arranging this?");
+                        + followParameters.getString("follows")
+                        + ", paths shouldn't follow paths that follow paths... probably. Consider re-arranging this?");
             }
         }
     }
@@ -604,12 +588,12 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         }
 
         int manaRegeneration = wand.getManaRegeneration();
-        if (this.manaRegeneration > 0 && maxManaRegeneration == 0 && this.manaRegeneration  > manaRegeneration) {
-            wand.setManaRegeneration((float)this.manaRegeneration);
+        if (this.manaRegeneration > 0 && maxManaRegeneration == 0 && this.manaRegeneration > manaRegeneration) {
+            wand.setManaRegeneration((float) this.manaRegeneration);
         }
         int manaMax = wand.getManaMax();
         if (this.maxMana > 0 && maxMaxMana == 0 && this.maxMaxMana > manaMax) {
-            wand.setManaMax((float)this.maxMana);
+            wand.setManaMax((float) this.maxMana);
         }
     }
 
@@ -636,14 +620,15 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
                     }
                     command = command.replace("@uuid", mage.getId())
                             .replace("@pn", mage.getName())
-                            .replace("@pd", mage.getDisplayName());;
+                            .replace("@pd", mage.getDisplayName());
+                    ;
                 }
                 if (location != null) {
                     command = command
-                        .replace("@world", location.getWorld().getName())
-                        .replace("@x", Double.toString(location.getX()))
-                        .replace("@y", Double.toString(location.getY()))
-                        .replace("@z", Double.toString(location.getZ()));
+                            .replace("@world", location.getWorld().getName())
+                            .replace("@x", Double.toString(location.getX()))
+                            .replace("@y", Double.toString(location.getY()))
+                            .replace("@z", Double.toString(location.getZ()));
                 }
                 WandUpgradePath upgrade = getPath(upgradeKey);
                 command = command.replace("$path", upgrade.getName());
@@ -654,10 +639,10 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         if (upgradeBroadcast != null && !upgradeBroadcast.isEmpty() && shouldBroadcast) {
             WandUpgradePath upgrade = getPath(upgradeKey);
             String message = upgradeBroadcast
-                .replace("$pn", mage.getName())
-                .replace("$pn", mage.getDisplayName())
-                .replace("$name", mage.getName())
-                .replace("$path", upgrade.getName());
+                    .replace("$pn", mage.getName())
+                    .replace("$pn", mage.getDisplayName())
+                    .replace("$name", mage.getName())
+                    .replace("$path", upgrade.getName());
             message = CompatibilityLib.getCompatibilityUtils().translateColors(message);
             for (Player messagePlayer : controller.getPlugin().getServer().getOnlinePlayers()) {
                 TextUtils.sendMessage(messagePlayer, message);
@@ -716,8 +701,8 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         if (upgradeRequiresLevel >= 0) {
             Mage m = properties.getMage();
             Player p = m != null ? m.getPlayer() : null;
-            MageLevel ml = p != null ? LevelAPI.get().getLevel(p) : null;
-            progress &= ml != null && ml.getLevel() >= upgradeRequiresLevel;
+            MageData md = LevelAPI.get().getLevel(p);
+            progress &= md != null && md.getLevel().getLevel() >= upgradeRequiresLevel;
         }
 
         return progress;
@@ -780,7 +765,7 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         Mage mage = caster.getMage();
 
         // Then check for spell requirements to advance
-        if(upgradeRequiresAllSpells) {
+        if (upgradeRequiresAllSpells) {
             for (PrerequisiteSpell prereq : requiredSpells) {
                 if (!caster.hasSpell(prereq.getSpellKey().getKey())) {
                     SpellTemplate spell = controller.getSpellTemplate(prereq.getSpellKey().getKey());
@@ -821,19 +806,15 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
 
         if (upgradeRequiresLevel >= 0) {
             Mage m = caster.getMage();
-            System.out.println("m = " + m);
             Player p = m != null ? m.getPlayer() : null;
-            System.out.println("p = " + p);
-            MageLevel ml = p != null ? LevelAPI.get().getLevel(p) : null;
-            System.out.println("ml = " + ml);
-            return ml != null && ml.getLevel() >= upgradeRequiresLevel;
+            MageData ml = p != null ? LevelAPI.get().getLevel(p) : null;
+            return ml != null && ml.getLevel().getLevel() >= upgradeRequiresLevel;
         }
 
         return true;
     }
 
-    public float getBonusLevelMultiplier()
-    {
+    public float getBonusLevelMultiplier() {
         return bonusLevelMultiplier;
     }
 
@@ -871,7 +852,7 @@ public class WandUpgradePath implements com.elmakers.mine.bukkit.api.wand.WandUp
         boolean addedProperties = false;
         ConfigurationSection wandProperties = ConfigurationUtils.newConfigurationSection();
         int manaRegeneration = properties.getManaRegeneration();
-        if (this.manaRegeneration > 0 && maxManaRegeneration == 0 && this.manaRegeneration  > manaRegeneration) {
+        if (this.manaRegeneration > 0 && maxManaRegeneration == 0 && this.manaRegeneration > manaRegeneration) {
             addedProperties = true;
             wandProperties.set("mana_regeneration", this.manaRegeneration);
         }

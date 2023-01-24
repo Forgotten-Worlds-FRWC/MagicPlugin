@@ -1778,6 +1778,8 @@ public class MagicController implements MageController, ChunkLoadListener {
         processConfigurations(loader, sender);
         registerHandlers(loader.getMainConfiguration());
 
+        plugin.getServer().getPluginManager().registerEvents(new MiscManaUseListener(this, (ManaCurrency) currencies.get("mana")), plugin);
+
         // We'll need to delay everything else by one tick to let integrating plugins have a chance to load.
         finalizingConfig = new PostStartupLoadTask(this, loader, sender);
         if (!loaded) {
