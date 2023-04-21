@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.geysermc.connector.common.ChatColor;
@@ -60,5 +61,10 @@ public class MiscManaUseListener implements Listener {
                 e.getPlayer().sendMessage(ChatColor.RED + "You are out of mana");
             }
         }
+    }
+
+    @EventHandler
+    public void onShootBow(EntityShootBowEvent e) {
+
     }
 }
